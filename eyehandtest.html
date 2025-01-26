@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eye and Hand Sensitivity Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .test-container {
+            margin-top: 50px;
+        }
+        #reaction-light {
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+            border-radius: 50%;
+            background-color: red;
+        }
+        .test-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        .text-sample {
+            margin-top: 30px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Eye and Hand Sensitivity Test</h1>
+    <div class="test-container">
+        <h2>Hand Reaction Test</h2>
+        <div id="reaction-light"></div>
+        <button id="start-button" class="test-button">Start</button>
+        <p id="reaction-time"></p>
+    </div>
+    <div class="test-container">
+        <h2>Eye Test</h2>
+        <p>Hold your screen at a comfortable distance and follow the instructions.</p>
+        <p id="eye-test-instructions">Press "Start Test" to begin. Identify each letter displayed on the screen until it becomes too small to read.</p>
+        <p class="text-sample" id="text-sample" style="font-size: 32px;">A</p>
+        <button id="start-eye-test" class="test-button">Start Test</button>
+        <button id="next-letter" class="test-button" disabled>Next Letter</button>
+    </div>
+    <script>
+        let startButton = document.getElementById("start-button");
+        let reactionLight = document.getElementById("reaction-light");
+        let reactionTimeText = document.getElementById("reaction-time");
+
+        let textSample = document.getElementById("text-sample");
+        let startEyeTestButton = document.getElementById("start-eye-test");
+        let nextLetterButton = document.getElementById("next-letter");
+        let eyeTestInstructions = document.getElementById("eye-test-instructions");
+
+        let startTime, timeout;
+        let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+        let currentLetterIndex = 0;
+        let fontSize = 32; // Initial font size in px
+
+        // Hand Reaction Test
+        startButton.addEventListener("click", () => {
+            reactionLight.style.backgroundColor = "red";
+            reactionTimeText.textContent = "";
+            startButton.disabled = true;
+
+            timeout = setTimeout(() => {
+                reactionLight.style.backgroundColor = "green";
+                startTime = Date.now();
+            }, Math.random() * 3000 + 2000);
+        });
+
+        document.body.addEventListener("keydown", (e) => {
+            if (e.code === "Space" && reactionLight.style.backgroundColor === "green") {
+                let reactionTime = Date.now() - startTime;
+                reactionTimeText.textContent = `Reaction Time: ${reactionTime} ms`;
+                resetReactionTest();
+            } else if (e.code === "Space" && reactionLight.style.backgroundColor === "red") {
+                reactionTimeText.textContent = "Too early! Wait for the green light.";
+            }
+        });
+
+        reactionLight.addEventListener("click", () => {
+            if (reactionLight.style.backgroundColor === "green") {
+                let reactionTime = Date.now() - startTime;
+                reactionTimeText.textContent = `Reaction Time: ${reactionTime} ms`;
+                resetReactionTest();
+            }
+        });
+
+        function resetReactionTest() {
+            clearTimeout(timeout);
+            reactionLight.style.backgroundColor = "red";
+            startButton.disabled = false;
+        }
+
+        // Eye Test
+        startEyeTestButton.addEventListener("click", () => {
+            fontSize = 32; // Reset font size
+            currentLetterIndex = 0; // Reset letter index
+            textSample.style.fontSize = `${fontSize}px`;
+            textSample.textContent = letters[currentLetterIndex];
+            eyeTestInstructions.textContent = "Identify each letter. Click 'Next Letter' to proceed.";
+            nextLetterButton.disabled = false;
+        });
+
+        nextLetterButton.addEventListener("click", () => {
+            if (fontSize > 8) { // Minimum font size
+                fontSize *= 0.9; // Reduce font size
+                textSample.style.fontSize = `${fontSize}px`;
+            } else {
+                textSample.textContent = "Test Complete";
+                eyeTestInstructions.textContent = "You've reached the limit of the test.";
+                nextLetterButton.disabled = true;
+                return;
+            }
+
+            currentLetterIndex = (currentLetterIndex + 1) % letters.length;
+            textSample.textContent = letters[currentLetterIndex];
+        });
+    </script>
+</body>
+</html>
