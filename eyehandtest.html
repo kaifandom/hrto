@@ -62,34 +62,29 @@
         let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
         let currentLetterIndex = 0;
         let fontSize = 32; // Initial font size in px
+        let isLightGreen = false;
 
         // Hand Reaction Test
         startButton.addEventListener("click", () => {
             reactionLight.style.backgroundColor = "red";
             reactionTimeText.textContent = "";
             startButton.disabled = true;
+            isLightGreen = false;
 
             timeout = setTimeout(() => {
                 reactionLight.style.backgroundColor = "green";
                 startTime = Date.now();
+                isLightGreen = true;
             }, Math.random() * 3000 + 2000);
         });
 
-        document.body.addEventListener("keydown", (e) => {
-            if (e.code === "Space" && reactionLight.style.backgroundColor === "green") {
-                let reactionTime = Date.now() - startTime;
-                reactionTimeText.textContent = `Reaction Time: ${reactionTime} ms`;
-                resetReactionTest();
-            } else if (e.code === "Space" && reactionLight.style.backgroundColor === "red") {
-                reactionTimeText.textContent = "Too early! Wait for the green light.";
-            }
-        });
-
         reactionLight.addEventListener("click", () => {
-            if (reactionLight.style.backgroundColor === "green") {
+            if (isLightGreen) {
                 let reactionTime = Date.now() - startTime;
                 reactionTimeText.textContent = `Reaction Time: ${reactionTime} ms`;
                 resetReactionTest();
+            } else {
+                reactionTimeText.textContent = "Too early! Wait for the green light.";
             }
         });
 
@@ -97,6 +92,7 @@
             clearTimeout(timeout);
             reactionLight.style.backgroundColor = "red";
             startButton.disabled = false;
+            isLightGreen = false;
         }
 
         // Eye Test
